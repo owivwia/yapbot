@@ -5,6 +5,15 @@ from discord.ext import commands
 
 logger = settings.logging.getLogger("bot")
 
+class Booper(commands.Converter):
+    async def convert(self, ctx, argument):
+        if argument.startswith("<@") and argument.endswith(">"):
+            user_id = argument[2:-1].replace("!", "")
+            member = await commands.MemberConverter().convert(ctx, user_id)
+            return f"Boop! {ctx.author.mention} booped {member.mention}! owo"
+        else: 
+            return f"{ctx.author.mention} booped the air! uwu"
+
 def run():
     intents = discord.Intents.default()
     intents.message_content = True
@@ -54,6 +63,15 @@ def run():
     async def subtract(ctx, one : int, two : int):
         """YapBot will help you do some quick mafs (-)!"""
         await ctx.send(one - two)
+
+    @bot.command()
+    async def boop(ctx, person : Booper ):
+        await ctx.send(person)
+
+    @boop.error
+    async def add_error(ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("You booped nothing!")
 
 
     bot.run(settings.DISCORD_API_SECRET, root_logger=True)
